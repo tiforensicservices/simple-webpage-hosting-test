@@ -1,0 +1,55 @@
+# Cline Rules — simple-webpage-hosting-test
+
+## 🧠 Memory Bank
+- Always read `memory-bank/activeContext.md` and `memory-bank/progress.md` at the start of every session
+- Update `memory-bank/activeContext.md` whenever the current focus changes
+- Update `memory-bank/progress.md` whenever a task is completed or a new blocker is found
+- Update `memory-bank/techContext.md` when new tools or dependencies are added
+
+## 🐳 Container First
+- All development work should happen inside the Dev Container, not on the host PC
+- Do not install Python packages, npm packages, or other dependencies on the host
+- Use `requirements.txt` or `package.json` to track dependencies inside the container
+
+## 🔀 Git Practices
+- Always check `git status` before starting work
+- Use meaningful commit messages: `type(scope): description`
+  - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+  - Example: `feat(auth): add user login endpoint`
+- Commit frequently — after each logical unit of work
+- Never commit directly to `main` — use feature branches
+- Never commit `.env` files, secrets, API keys, or credentials
+
+## 🐍 Python Standards
+- Use virtual environments (virtualenv) for all Python projects
+- Follow PEP 8 style guide
+- Use type hints where possible
+- Write docstrings for all functions and classes
+- Keep functions small and focused (single responsibility)
+
+## 🌐 Web Standards
+- Mobile-first responsive design
+- Semantic HTML5
+- Accessible markup (ARIA labels where needed)
+- Validate HTML and CSS
+
+## ☁️ AWS / Security
+- Never hardcode AWS credentials — use environment variables or IAM roles
+- Follow principle of least privilege for all IAM permissions
+- Use HTTPS everywhere
+- Log all errors appropriately
+
+## 📋 Code Review Checklist (before committing)
+- [ ] Does it work as expected?
+- [ ] Are there any hardcoded secrets or credentials?
+- [ ] Is the code readable and well-commented?
+- [ ] Are tests written for new functionality?
+- [ ] Is the memory bank up to date?
+- [ ] Is `.gitignore` covering new file types?
+
+## 🚨 Issue Tracking
+When a problem is encountered, document it in `memory-bank/progress.md` under "Known Issues / Blockers" with:
+- Description of the issue
+- Steps taken to investigate
+- Current status (open/resolved)
+- Date discovered

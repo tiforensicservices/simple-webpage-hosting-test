@@ -1,0 +1,44 @@
+{
+  "name": "simple-webpage-hosting-test",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "github.vscode-pull-request-github",
+        "eamodio.gitlens",
+        "ms-toolsai.jupyter",
+        "saoudrizwan.claude-dev",
+        "ms-azuretools.vscode-containers",
+        "amazonwebservices.aws-toolkit-vscode"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install virtualenv && echo 'Dev container ready!'",
+  "remoteUser": "vscode",
+  "mounts": [],
+  "forwardPorts": [3000, 5000, 8000, 8080]
+}
