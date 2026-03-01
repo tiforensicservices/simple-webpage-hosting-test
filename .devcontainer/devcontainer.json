@@ -1,12 +1,11 @@
 {
-  "name": "simple-webpage-hosting-test",
-  "image": "mcr.microsoft.com/devcontainers/python:3.13",
+  "name": "Shoe Print Image System - Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    },
-    "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/git:1": {}
   },
   "customizations": {
     "vscode": {
@@ -14,31 +13,31 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-python.debugpy",
-        "ms-python.black-formatter",
-        "ms-python.isort",
+        "ms-python.vscode-python-envs",
+        "ms-azuretools.vscode-containers",
         "github.vscode-pull-request-github",
-        "eamodio.gitlens",
         "ms-toolsai.jupyter",
         "saoudrizwan.claude-dev",
-        "ms-azuretools.vscode-containers",
-        "amazonwebservices.aws-toolkit-vscode"
+        "amazonwebservices.aws-toolkit-vscode",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.formatting.provider": "black",
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.black-formatter",
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter",
-          "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
-          }
-        },
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "editor.rulers": [88],
+        "files.trimTrailingWhitespace": true
       }
     }
   },
-  "postCreateCommand": "pip install --upgrade pip && pip install virtualenv && echo 'Dev container ready!'",
-  "remoteUser": "vscode",
-  "mounts": [],
-  "forwardPorts": [3000, 5000, 8000, 8080]
+  "postCreateCommand": "pip install -r requirements.txt",
+  "remoteEnv": {
+    "AWS_DEFAULT_REGION": "${localEnv:AWS_DEFAULT_REGION}",
+    "AWS_ACCESS_KEY_ID": "${localEnv:AWS_ACCESS_KEY_ID}",
+    "AWS_SECRET_ACCESS_KEY": "${localEnv:AWS_SECRET_ACCESS_KEY}"
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder}/.env,target=/workspaces/simple-webpage-hosting-test/.env,type=bind,consistency=cached"
+  ]
 }

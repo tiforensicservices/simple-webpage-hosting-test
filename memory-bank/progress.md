@@ -16,20 +16,35 @@
 - [x] Created `.gitignore`
 - [x] Created `memory-bank/` with project documentation files
 - [x] Created `.clinerules` with coding standards
-- [x] Installing Docker Desktop 4.60.1
+- [x] Installed Docker Desktop 4.60.1 (complete — was pending restart)
+
+### Infrastructure Scaffolding (2026-03-01)
+- [x] Created `.devcontainer/devcontainer.json` — Dev Container config
+- [x] Created `.devcontainer/Dockerfile` — Python 3.13 + AWS CLI v2
+- [x] Created `requirements.txt` — all Python dependencies
+- [x] Created `.env.example` — safe credential template
+- [x] Created `src/aws/setup_s3.py` — S3 bucket creation script
+- [x] Created `tests/test_setup_s3.py` — unit tests for S3 setup
+- [x] Created `docs/aws-setup-guide.md` — step-by-step AWS setup guide
+- [x] Created `.github/workflows/ci.yml` — GitHub Actions CI pipeline
+- [x] Updated project brief, tech context, system patterns, active context
 
 ## 🔄 In Progress
-- [ ] Docker Desktop installation (pending PC restart)
-- [ ] Dev Container setup
+- [ ] Create IAM user `shoeprint-dev` in AWS Console
+- [ ] Generate + store AWS access keys in `.env`
+- [ ] Push initial commit to GitHub on `develop` branch
+- [ ] Rebuild Dev Container to use new `.devcontainer/` config
 
 ## 📋 Upcoming
-- [ ] Restart PC to activate Docker Desktop
-- [ ] Create `.devcontainer/` configuration
-- [ ] Open project in Dev Container
-- [ ] Create GitHub repository and push initial commit
-- [ ] Decide on application type and tech stack
-- [ ] Begin application development
-- [ ] Set up AWS deployment pipeline
+- [ ] Run `python src/aws/setup_s3.py` to create S3 bucket
+- [ ] Verify AWS CLI connection (`aws sts get-caller-identity`)
+- [ ] Design image ingestion pipeline
+- [ ] Build automated shoe scraper
+- [ ] Set up RDS PostgreSQL database
+- [ ] Integrate AWS Rekognition for visual search
+- [ ] Build FastAPI backend
+- [ ] Deploy to ECS/Fargate
+- [ ] Set up EventBridge scheduler for scraper
 
 ## ❌ Known Issues / Blockers
-- Docker Desktop requires a full PC restart before it becomes usable
+- None currently — all tooling in place, waiting on IAM credentials
