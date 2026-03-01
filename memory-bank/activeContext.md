@@ -1,46 +1,51 @@
 # Active Context
 
 ## Current Focus
-S3 bucket setup is **complete**. The `.clinerules` file has been updated with session
-management rules (context window alerts + mandatory memory bank save triggers).
-Next focus: commit all changes to `develop` branch and begin planning the image
-ingestion pipeline.
+**Phase 0 — Infrastructure Corrections.** The full Gaitway build plan has been finalized
+and saved to `docs/build-plan.md`. Memory bank has been updated with the complete project
+brief. Next action: create the new S3 bucket `gaitway-footwear-791209948637` in `us-east-2`
+and update all config files to the correct region.
 
-## What Was Just Done (2026-03-01 Session)
-- **Verified AWS API key connection** — user ran `python src/aws/setup_s3.py` successfully
-  in the VS Code terminal (S3 bucket created, configured, and verified)
-- **Updated `.clinerules`** with a new `## 🔄 Session Management` section containing:
-  - ⚠️ Context Window Alert: warn after ~20 tool calls/exchanges, update memory bank,
-    recommend fresh session
-  - 💾 Mandatory Memory Bank Save Triggers: table of trigger → files to update
-  - ✅ End-of-Session Checklist: 4-point checklist before closing out
-- Memory bank files updated to reflect completed S3 work
+## What Was Just Done (2026-03-01 Session 3)
+- Verified AWS API key connection (S3 setup script ran successfully in previous session)
+- Updated `.clinerules` with Session Management section (context window alerts, memory
+  bank save triggers, end-of-session checklist)
+- Created comprehensive build plan: `docs/build-plan.md` with full phase breakdown,
+  architecture, cost estimates (build: ~$400–670, ops: ~$210–250/month at launch),
+  and timeline (~5–6 months to MVP)
+- Updated `memory-bank/projectbrief.md` with complete Gaitway brief
+- Reviewed plan with Opus 4.6 model — identified corrections:
+  - S3 bucket `cf-templates-*` is a CF auto-generated bucket, not suitable for app data
+  - Time estimates from Sonnet were unrealistic (weeks, not days)
+  - Need 3 separate services (API, scraper, image processor), not monolith
+  - Missing: auth system, anti-bot strategy, ML model strategy, secrets management,
+    cost estimation, testing strategy, legal considerations
 
-## Next Steps
-1. **Commit all pending changes** to `develop` branch:
-   - `src/aws/setup_s3.py` — `load_dotenv(override=True)` fix
-   - `.clinerules` — new Session Management section
-   - `memory-bank/` — updated progress and context files
-2. **Verify S3 bucket** in AWS Console (bucket: `shoeprint-images-791209948637`)
-3. **Begin image ingestion pipeline design**
-   - Define folder structure (raw/, processed/, thumbnails/ — already created)
-   - Plan automated shoe scraper
-   - Plan Lambda or ECS task for image processing
+## Key Decisions Made
+- **S3 bucket:** Create new dedicated `gaitway-footwear-791209948637` in `us-east-2`
+  (NOT reuse the CF templates bucket)
+- **Region:** `us-east-2` (Ohio) — corrected from `us-east-1`
+- **Architecture:** 3 separate ECS services (API, scraper, image processor)
+- **Auth:** AWS Cognito (recommended)
+- **Phase 0.5 PoC:** Prove end-to-end pipeline with ONE retailer before scaling
 
-## Environment State (as of 2026-03-01 22:00)
-- Python 3.13.11 — ✅ installed
-- boto3 (latest) — ✅ installed via pip
-- python-dotenv (latest) — ✅ installed via pip
-- `.env` file — ✅ present with valid credentials
-- AWS Account ID: `791209948637`
-- S3 Bucket: `shoeprint-images-791209948637` — ✅ **CREATED AND CONFIGURED**
-- Region: `us-east-1`
-- IAM User: `shoeprint-dev`
-- Folders created: `raw/`, `processed/`, `thumbnails/`
-- Encryption: AES-256 ✅
-- Versioning: enabled ✅
-- Public access: blocked ✅
-- Lifecycle policy: applied ✅
+## Next Steps (Phase 0)
+1. Create S3 bucket `gaitway-footwear-791209948637` in `us-east-2`
+2. Set up folder structure: `raw/`, `processed/`, `impressions/`, `thumbnails/`,
+   `crime-scene/`, `user-shoes/`
+3. Update `.env` and `.env.example` with new region and bucket
+4. Update `src/aws/setup_s3.py` for the new bucket
+5. Update `memory-bank/systemPatterns.md` and `techContext.md` with Gaitway architecture
+6. Commit all Phase 0 changes to `develop` branch
+
+## Environment State
+- Python 3.13.11 — ✅
+- boto3 + python-dotenv — ✅ installed
+- `.env` — ✅ present (credentials verified)
+- AWS Account: `791209948637`
+- Old S3 bucket: `shoeprint-images-791209948637` (us-east-1) — still exists but deprecated
+- New S3 bucket: `gaitway-footwear-791209948637` (us-east-2) — **TO BE CREATED**
+- IAM User: `shoeprint-dev` (may need renaming or new user)
 
 ## Current Blockers
-- None. Ready to commit and move to next phase.
+- None. Ready to proceed with Phase 0.
