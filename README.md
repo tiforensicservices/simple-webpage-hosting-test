@@ -12,7 +12,7 @@ A web application project built with VS Code + Cline (AI assistant), developed i
 ### Running in a Dev Container (Recommended)
 1. Clone the repository:
    ```bash
-   git clone https://github.com/kigow/simple-webpage-hosting-test.git
+   git clone https://github.com/tiforensicservices/simple-webpage-hosting-test.git
    cd simple-webpage-hosting-test
    ```
 2. Open in VS Code:
