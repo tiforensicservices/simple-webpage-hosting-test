@@ -25,7 +25,9 @@ from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+# override=True ensures .env values take precedence over any empty
+# environment variables that may have been injected by the Dev Container
+load_dotenv(override=True)
 
 # Configure logging
 logging.basicConfig(

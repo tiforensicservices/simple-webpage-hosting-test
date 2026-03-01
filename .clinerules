@@ -47,6 +47,35 @@
 - [ ] Is the memory bank up to date?
 - [ ] Is `.gitignore` covering new file types?
 
+## 🔄 Session Management
+
+### ⚠️ Context Window Alert
+- After every **~20 tool calls or exchanges** in a single session, proactively:
+  1. Issue a warning: `⚠️ Context window is growing large — saving state and recommending a fresh session soon`
+  2. Update all memory bank files with the current state
+  3. Suggest starting a new session before the next major task
+- Also alert if **more than 2–3 distinct topics** have been discussed in one session — this is a sign the conversation is sprawling and state may be lost
+- Never allow a session to end abruptly without saving memory bank state first
+
+### 💾 Memory Bank — Mandatory Save Triggers
+Update memory bank files immediately when any of the following occur:
+
+| Trigger | Files to Update |
+|---|---|
+| Any source file created or significantly modified | `activeContext.md` |
+| Any AWS / infrastructure change | `activeContext.md` + `progress.md` |
+| Any task or sub-task completed | `progress.md` |
+| New dependency, tool, or service added | `techContext.md` |
+| Any error or blocker encountered | `progress.md` |
+| Before ending any session | All memory bank files |
+| Before starting a new major task | `activeContext.md` |
+
+### ✅ End-of-Session Checklist (run before closing out)
+- [ ] `activeContext.md` updated: current focus, what was just done, next steps
+- [ ] `progress.md` updated: completed items checked off, blockers documented
+- [ ] No uncommitted changes that should be staged and pushed
+- [ ] Git status clean or pending changes are intentional
+
 ## 🚨 Issue Tracking
 When a problem is encountered, document it in `memory-bank/progress.md` under "Known Issues / Blockers" with:
 - Description of the issue

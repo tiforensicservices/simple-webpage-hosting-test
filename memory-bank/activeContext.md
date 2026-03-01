@@ -1,40 +1,46 @@
 # Active Context
 
 ## Current Focus
-Setting up AWS infrastructure and project scaffolding for the Shoe Print Image System.
-Dev Container, project structure, S3 setup script, CI/CD pipeline, and documentation
-are all created. Next: Create IAM user in AWS Console, configure `.env`, and do first commit.
+S3 bucket setup is **complete**. The `.clinerules` file has been updated with session
+management rules (context window alerts + mandatory memory bank save triggers).
+Next focus: commit all changes to `develop` branch and begin planning the image
+ingestion pipeline.
 
-## What Was Just Done (2026-03-01)
-- Created `.devcontainer/devcontainer.json` and `Dockerfile`
-  - Python 3.13-slim-bookworm base image
-  - AWS CLI v2 installed inside container
-  - All Python packages defined in `requirements.txt`
-- Created `requirements.txt` with boto3, Pillow, FastAPI, SQLAlchemy, etc.
-- Created `.env.example` — safe template for AWS credentials (committed)
-- Created `src/aws/setup_s3.py` — full S3 bucket setup script with:
-  - Bucket creation
-  - Public access block
-  - AES-256 encryption
-  - Versioning
-  - Lifecycle policy (→ Standard-IA at 90 days, → Glacier at 365 days)
-  - Folder structure (raw/, processed/, thumbnails/)
-- Created `tests/test_setup_s3.py` — unit tests
-- Created `docs/aws-setup-guide.md` — step-by-step AWS IAM + S3 setup guide
-- Created `.github/workflows/ci.yml` — GitHub Actions CI pipeline
-- Updated all memory bank files with new shoe print system scope
-
-## In Progress
-- **Step 3:** User needs to create IAM user in AWS Console (see `docs/aws-setup-guide.md`)
-- **Step 2:** Push initial commit to GitHub on `develop` branch
+## What Was Just Done (2026-03-01 Session)
+- **Verified AWS API key connection** — user ran `python src/aws/setup_s3.py` successfully
+  in the VS Code terminal (S3 bucket created, configured, and verified)
+- **Updated `.clinerules`** with a new `## 🔄 Session Management` section containing:
+  - ⚠️ Context Window Alert: warn after ~20 tool calls/exchanges, update memory bank,
+    recommend fresh session
+  - 💾 Mandatory Memory Bank Save Triggers: table of trigger → files to update
+  - ✅ End-of-Session Checklist: 4-point checklist before closing out
+- Memory bank files updated to reflect completed S3 work
 
 ## Next Steps
-1. 🙋 **User action:** Follow `docs/aws-setup-guide.md` to create IAM user + access keys
-2. 🙋 **User action:** Copy `.env.example` → `.env` and fill in credentials
-3. ✅ Run `python src/aws/setup_s3.py` inside Dev Container to create S3 bucket
-4. Open project in Dev Container (VS Code "Reopen in Container")
-5. Begin planning image ingestion pipeline
+1. **Commit all pending changes** to `develop` branch:
+   - `src/aws/setup_s3.py` — `load_dotenv(override=True)` fix
+   - `.clinerules` — new Session Management section
+   - `memory-bank/` — updated progress and context files
+2. **Verify S3 bucket** in AWS Console (bucket: `shoeprint-images-791209948637`)
+3. **Begin image ingestion pipeline design**
+   - Define folder structure (raw/, processed/, thumbnails/ — already created)
+   - Plan automated shoe scraper
+   - Plan Lambda or ECS task for image processing
+
+## Environment State (as of 2026-03-01 22:00)
+- Python 3.13.11 — ✅ installed
+- boto3 (latest) — ✅ installed via pip
+- python-dotenv (latest) — ✅ installed via pip
+- `.env` file — ✅ present with valid credentials
+- AWS Account ID: `791209948637`
+- S3 Bucket: `shoeprint-images-791209948637` — ✅ **CREATED AND CONFIGURED**
+- Region: `us-east-1`
+- IAM User: `shoeprint-dev`
+- Folders created: `raw/`, `processed/`, `thumbnails/`
+- Encryption: AES-256 ✅
+- Versioning: enabled ✅
+- Public access: blocked ✅
+- Lifecycle policy: applied ✅
 
 ## Current Blockers
-- None — Dev Container needs to be rebuilt to pick up new `.devcontainer/` config
-- IAM credentials needed before running `setup_s3.py`
+- None. Ready to commit and move to next phase.
