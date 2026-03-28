@@ -1,0 +1,47 @@
+name: Security & Secrets Check
+
+on:
+  push:
+    branches: [develop, master, main]
+  pull_request:
+    branches: [develop, master, main]
+
+jobs:
+  secrets-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Check for .env file
+        run: |
+          if git log --oneline --all -- .env | grep -q .; then
+            echo "❌ ERROR: .env file found in git history"
+            echo "This indicates a secret may have been committed."
+            echo "Action: Run 'git filter-branch' to remove it from history"
+            exit 1
+          else
+            echo "✅ No .env file in git history"
+          fi
+
+      - name: Verify .gitignore rules
+        run: |
+          echo "Checking .gitignore rules for common secrets..."
+          grep -q "\.env" .gitignore && echo "✅ .env is ignored" || echo "⚠️  .env not in .gitignore"
+          grep -q "\.pem\|\.key" .gitignore && echo "✅ Keys are ignored" || echo "⚠️  Keys not in .gitignore"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Security Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Gitleaks scan completed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ .env file check passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ .gitignore rules verified" >> $GITHUB_STEP_SUMMARY

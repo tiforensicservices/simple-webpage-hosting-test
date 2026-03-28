@@ -1,5 +1,5 @@
 # ================================================================
-# Python Dependencies — Shoe Print Image System
+# Python Dependencies — Gaitway Footwear Intelligence Database
 # Install inside Dev Container only: pip install -r requirements.txt
 # ================================================================
 
@@ -9,6 +9,8 @@ botocore==1.35.0
 
 # Image processing
 Pillow==10.4.0
+opencv-python==4.10.0.84
+numpy==2.1.1
 
 # HTTP requests & web scraping
 requests==2.32.3
@@ -19,13 +21,24 @@ lxml==5.3.0
 pandas==2.2.2
 python-dotenv==1.0.1
 
-# Database (PostgreSQL)
+# Database (PostgreSQL + pgvector)
 psycopg2-binary==2.9.9
 SQLAlchemy==2.0.35
+alembic==1.13.3
+pgvector==0.3.3
 
 # Web framework (API backend)
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
+
+# CLI
+typer[all]==0.12.5
+
+# Billing
+stripe==11.4.1
+
+# Config
+pyyaml==6.0.2
 
 # Code quality
 black==24.8.0
@@ -35,6 +48,7 @@ ruff==0.6.9
 # Testing
 pytest==8.3.3
 pytest-cov==5.0.0
+moto[s3,sts]==5.0.26
 
 # Utilities
 python-multipart==0.0.12

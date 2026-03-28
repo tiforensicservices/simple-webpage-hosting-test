@@ -1,0 +1,149 @@
+# config/scrapers.yaml — Gaitway Scraper Site Configuration
+#
+# Each entry under `scrapers` defines settings for one retailer scraper.
+# The scraper framework reads this file to determine which sites to crawl,
+# at what rate, and which category pages to start from.
+#
+# Fields per site:
+#   enabled               — whether this site is active in crawl-all / EventBridge jobs
+#   base_url              — root URL of the retailer site
+#   rate_limit_per_second — max requests per second (including jitter)
+#   max_pages             — max category pages to crawl per run
+#   categories            — list of category slugs / paths to crawl
+#   start_urls            — explicit starting URLs (overrides category generation)
+#   user_agent_pool       — optional override of the default UA pool
+#
+# Rate limiting guidance:
+#   0.5 req/s = 1 request every 2 seconds (conservative, good for prod)
+#   1.0 req/s = 1 request per second (moderate)
+#   2.0 req/s = 2 requests per second (aggressive — use only with proxy)
+
+scrapers:
+
+  # ── Zappos ─────────────────────────────────────────────────────────────────
+  # Phase 0.5: first retailer — SSR HTML, structured schema.org data
+  zappos:
+    enabled: true
+    base_url: https://www.zappos.com
+    rate_limit_per_second: 0.5
+    max_pages: 20
+    categories:
+      - mens-shoes
+      - womens-shoes
+      - kids-shoes
+      - mens-boots
+      - womens-boots
+      - mens-sandals
+      - womens-sandals
+      - mens-sneakers
+      - womens-sneakers
+    image_size_override: "600x600"  # upgrade thumbnail URLs to hi-res
+
+  # ── Amazon ─────────────────────────────────────────────────────────────────
+  # Phase 9: dynamic content — requires Playwright or Product Advertising API
+  amazon:
+    enabled: false
+    base_url: https://www.amazon.com
+    rate_limit_per_second: 0.3
+    max_pages: 10
+    categories:
+      - mens-shoes
+      - womens-shoes
+    notes: "Requires Playwright (JS-rendered) or Product Advertising API v5"
+
+  # ── DSW (Designer Shoe Warehouse) ──────────────────────────────────────────
+  # Phase 9: SSR HTML, good schema.org markup
+  dsw:
+    enabled: false
+    base_url: https://www.dsw.com
+    rate_limit_per_second: 0.5
+    max_pages: 15
+    categories:
+      - mens/shoes
+      - womens/shoes
+      - kids/shoes
+
+  # ── Foot Locker ────────────────────────────────────────────────────────────
+  # Phase 9: SSR HTML, sneaker-heavy catalog
+  foot_locker:
+    enabled: false
+    base_url: https://www.footlocker.com
+    rate_limit_per_second: 0.5
+    max_pages: 15
+    categories:
+      - mens/shoes
+      - womens/shoes
+      - kids/shoes/sneakers
+
+  # ── Nike ───────────────────────────────────────────────────────────────────
+  # Phase 9: JS-rendered SPA — requires Playwright
+  nike:
+    enabled: false
+    base_url: https://www.nike.com
+    rate_limit_per_second: 0.3
+    max_pages: 10
+    categories:
+      - w/mens-shoes
+      - w/womens-shoes
+    notes: "JS-rendered SPA — requires Playwright"
+
+  # ── Adidas ─────────────────────────────────────────────────────────────────
+  # Phase 9: JS-rendered SPA — requires Playwright
+  adidas:
+    enabled: false
+    base_url: https://www.adidas.com
+    rate_limit_per_second: 0.3
+    max_pages: 10
+    categories:
+      - us/men-shoes
+      - us/women-shoes
+    notes: "JS-rendered SPA — requires Playwright"
+
+  # ── Finish Line ────────────────────────────────────────────────────────────
+  # Phase 9: SSR HTML
+  finish_line:
+    enabled: false
+    base_url: https://www.finishline.com
+    rate_limit_per_second: 0.5
+    max_pages: 10
+    categories:
+      - mens/shoes
+      - womens/shoes
+
+  # ── New Balance ────────────────────────────────────────────────────────────
+  # Phase 9: SSR HTML, good structured data
+  new_balance:
+    enabled: false
+    base_url: https://www.newbalance.com
+    rate_limit_per_second: 0.5
+    max_pages: 10
+    categories:
+      - mens/shoes
+      - womens/shoes
+
+  # ── Skechers ───────────────────────────────────────────────────────────────
+  # Phase 9: SSR HTML
+  skechers:
+    enabled: false
+    base_url: https://www.skechers.com
+    rate_limit_per_second: 0.5
+    max_pages: 10
+    categories:
+      - mens-shoes
+      - womens-shoes
+      - kids-shoes
+
+# ── Global defaults (applied to all scrapers unless overridden) ─────────────
+defaults:
+  request_timeout_seconds: 30
+  retry_max_attempts: 3
+  retry_backoff_base: 2.0        # exponential: 2^attempt seconds
+  robots_txt_respect: true
+  user_agent_pool:
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0"
+    - "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Safari/605.1.15"
+  image_download_timeout_seconds: 60
+  max_images_per_product: 8
+  s3_upload_retry_attempts: 3

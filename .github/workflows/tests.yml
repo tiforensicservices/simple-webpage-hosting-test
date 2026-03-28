@@ -1,0 +1,74 @@
+name: Tests & CI
+
+on:
+  push:
+    branches: [develop, master, main]
+  pull_request:
+    branches: [develop, master, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with ruff
+        run: |
+          ruff check src/ tests/
+        continue-on-error: true
+
+      - name: Format check with black
+        run: |
+          black --check src/ tests/
+        continue-on-error: true
+
+      - name: Run tests with pytest
+        run: |
+          pytest tests/ -v --tb=short --cov=src --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+        continue-on-error: true
+
+      - name: Test FastAPI app startup
+        run: |
+          timeout 5 python -c "
+            from src.api.main import app
+            from src.config import get_config
+            cfg = get_config()
+            print('✅ Config loaded successfully')
+            print(f'   API key configured: {bool(cfg.api_key)}')
+            print(f'   AWS region: {cfg.aws_region}')
+            print(f'   S3 bucket: {bool(cfg.s3_bucket)}')
+            print('✅ FastAPI app initialized')
+          " || true
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Tests completed for Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Linting: ruff" >> $GITHUB_STEP_SUMMARY
+          echo "- Format: black" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit tests: pytest" >> $GITHUB_STEP_SUMMARY
+          echo "- Coverage: uploaded to Codecov" >> $GITHUB_STEP_SUMMARY

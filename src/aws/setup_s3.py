@@ -1,12 +1,13 @@
 """
-setup_s3.py — Create and configure the S3 bucket for shoe print image storage.
+setup_s3.py — Create and configure the Gaitway S3 bucket for footwear image storage.
 
 This script:
   1. Creates the S3 bucket (if it doesn't already exist)
   2. Enables versioning (so we never lose an image)
   3. Applies a lifecycle policy (move old images to cheaper storage after 90 days)
   4. Enables server-side encryption (AES-256)
-  5. Blocks all public access (images are private by default)
+  5. Blocks all public access (all images accessed via presigned URLs only)
+  6. Creates the Gaitway folder structure
 
 Usage (inside Dev Container):
     python src/aws/setup_s3.py
@@ -22,12 +23,7 @@ import sys
 
 import boto3
 from botocore.exceptions import ClientError
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-# override=True ensures .env values take precedence over any empty
-# environment variables that may have been injected by the Dev Container
-load_dotenv(override=True)
+from src.config import get_config
 
 # Configure logging
 logging.basicConfig(
@@ -43,7 +39,7 @@ def get_s3_client() -> boto3.client:
     Returns:
         boto3 S3 client configured from environment variables.
     """
-    region = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+    region = os.getenv("AWS_DEFAULT_REGION", "us-east-2")
     return boto3.client("s3", region_name=region)
 
 
@@ -168,22 +164,37 @@ def apply_lifecycle_policy(client: boto3.client, bucket_name: str) -> None:
     logger.info("✅ Lifecycle policy applied on s3://%s", bucket_name)
 
 
-def create_folder_structure(client: boto3.client, bucket_name: str) -> None:
-    """Create logical folder prefixes within the bucket.
+def create_folder_structure(
+    client: boto3.client, bucket_name: str, cfg = None
+) -> None:
+    """Create logical folder prefixes within the Gaitway bucket.
 
     Folders:
-        raw/        — Original uploaded images
-        processed/  — Normalized/resized images
-        thumbnails/ — Small preview images
+        raw/          — Original retailer images (unmodified, from scrapers)
+        processed/    — Normalized/resized outsole & upper images
+        impressions/  — AI-generated synthetic test impressions
+        thumbnails/   — Small previews for web display
+        crime-scene/  — Uploaded crime scene footwear impressions (per workspace)
+        user-shoes/   — User-uploaded shoes (upload wizard)
 
     Args:
         client: Authenticated boto3 S3 client.
         bucket_name: Name of the target bucket.
+        cfg: Optional Config object; if None, uses default environment variables.
     """
+    # Use provided config or defaults from environment
+    if cfg is None:
+        from src.config import get_config
+
+        cfg = get_config()
+
     prefixes = [
-        os.getenv("S3_RAW_PREFIX", "raw/"),
-        os.getenv("S3_PROCESSED_PREFIX", "processed/"),
-        os.getenv("S3_THUMBNAILS_PREFIX", "thumbnails/"),
+        cfg.s3_raw_prefix,
+        cfg.s3_processed_prefix,
+        cfg.s3_impressions_prefix,
+        cfg.s3_thumbnails_prefix,
+        cfg.s3_crime_scene_prefix,
+        cfg.s3_user_shoes_prefix,
     ]
     for prefix in prefixes:
         client.put_object(Bucket=bucket_name, Key=prefix)
@@ -212,13 +223,15 @@ def verify_connection(client: boto3.client) -> bool:
 
 def main() -> None:
     """Main entry point — run the full S3 setup sequence."""
-    bucket_name = os.getenv("S3_BUCKET_NAME")
-    region = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+    # Use centralized config loader which canonicalizes env names
+    cfg = get_config()
+    bucket_name = cfg.s3_bucket
+    region = cfg.aws_region or "us-east-1"
 
-    if not bucket_name or bucket_name == "shoeprint-images-YOUR_ACCOUNT_ID":
+    if not bucket_name or bucket_name == "gaitway-footwear-YOUR_ACCOUNT_ID":
         logger.error(
-            "❌ S3_BUCKET_NAME is not set in .env — "
-            "please copy .env.example to .env and fill in your values."
+            "❌ S3 bucket name is not configured. Set `S3_BUCKET_NAME` as an environment "
+            "variable or configure your secrets manager according to the README."
         )
         sys.exit(1)
 
@@ -243,11 +256,12 @@ def main() -> None:
     apply_lifecycle_policy(client, bucket_name)
 
     # Step 5: Folder structure
-    create_folder_structure(client, bucket_name)
+    create_folder_structure(client, bucket_name, cfg)
 
     logger.info("")
     logger.info("🎉 S3 setup complete! Bucket s3://%s is ready.", bucket_name)
-    logger.info("   Next step: Run the image upload script or open the AWS Console")
+    logger.info("   Folders: raw/ | processed/ | impressions/ | thumbnails/ | crime-scene/ | user-shoes/")
+    logger.info("   Next step: Phase 0.5 PoC — write ZapposScraper and upload first images")
     logger.info(
         "   Console URL: https://s3.console.aws.amazon.com/s3/buckets/%s", bucket_name
     )

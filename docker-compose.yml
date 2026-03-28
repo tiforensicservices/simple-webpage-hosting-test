@@ -1,0 +1,46 @@
+# docker-compose.yml — Local development services for Gaitway
+#
+# Services:
+#   db  — PostgreSQL 16 with pgvector extension pre-installed
+#
+# Usage:
+#   docker compose up -d          # Start in background
+#   docker compose down           # Stop and remove containers
+#   docker compose down -v        # Stop AND delete the volume (fresh start)
+#   docker compose logs -f db     # Follow database logs
+#
+# The pgvector/pgvector:pg16 image includes the vector extension;
+# init_db.sql activates it inside the gaitway database automatically.
+#
+# Connection string (matches .env defaults):
+#   postgresql://gaitway:gaitway_local@localhost:5432/gaitway
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: gaitway-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: gaitway
+      POSTGRES_USER: gaitway
+      POSTGRES_PASSWORD: gaitway_local
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persist data across container restarts
+      - pgdata:/var/lib/postgresql/data
+      # Run init SQL on first start to enable pgvector extension
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gaitway -d gaitway"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  pgdata:
+    driver: local
+    labels:
+      project: "gaitway"
+      description: "PostgreSQL + pgvector data volume"

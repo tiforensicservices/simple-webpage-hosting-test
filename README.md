@@ -51,6 +51,28 @@ See [`.clinerules`](.clinerules) for coding standards and best practices.
 ## 📊 Progress
 See [`memory-bank/progress.md`](memory-bank/progress.md) for current status and known issues.
 
+## 🔐 Secrets & API Keys
+
+- Copy `.env.example` to `.env` and fill in your values for local development.
+- Never commit `.env` — this repository's `.gitignore` already excludes it.
+- For production, prefer a secrets manager (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) or platform-provided environment variables.
+- If a secret is accidentally committed or shared, rotate it immediately.
+
+Example local workflow:
+
+```bash
+cp .env.example .env
+# edit .env and set API_KEY and other secrets
+```
+
+Access from Python using the project's `src/config.py` helper:
+
+```py
+from src.config import get_config
+cfg = get_config()
+print(bool(cfg.api_key))  # True if configured (do not print the key itself)
+```
+
 ## ☁️ AWS Deployment
 Deployment documentation will be added once the deployment method is decided.
 
