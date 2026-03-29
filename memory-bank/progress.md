@@ -156,8 +156,13 @@
 - [x] Fixed: psycopg2-binary 2.9.9→2.9.10 (Py3.13 CP313 wheel)
 - [x] Fixed: stale Zappos URL → no-results detection added to ZapposScraper
 
+### ✅ Test Suite Hygiene (2026-03-29 Session 7) — DONE
+- [x] `pytest.ini` — created; suppresses lxml C extension DeprecationWarning via `filterwarnings`
+- [x] `tests/conftest.py` — pre-import `warnings.filterwarnings()` for lxml strip_cdata warning
+- [x] **99/99 passed, 0 errors, 0 warnings in 0.51s** ✅
+- [x] Committed: `0097fc9` — "tests: silence lxml third-party DeprecationWarning"
+
 ### Priority 2: Start API Dev Server
-- [ ] `pip install -r requirements.txt` (in Dev Container or host)
 - [ ] `uvicorn src.api.main:app --reload`
 - [ ] Verify Swagger UI at http://localhost:8000/docs
 
