@@ -23,6 +23,19 @@ Notes
 
 from __future__ import annotations
 
+# ── Suppress third-party C extension DeprecationWarnings ─────────────────────
+# lxml's HTMLParser emits "The 'strip_cdata' option has never done anything"
+# from inside its compiled C extension (parser.pxi).  This cannot be silenced
+# via pytest.ini module-based filters because lxml uses an anonymous C module.
+# We must call warnings.filterwarnings() here, before lxml is imported,
+# so the filter is registered in Python's warnings registry first.
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message="The 'strip_cdata' option of HTMLParser",
+    category=DeprecationWarning,
+)
+
 import os
 from typing import Generator
 from unittest.mock import patch
