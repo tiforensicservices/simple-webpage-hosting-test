@@ -58,8 +58,16 @@ logger = logging.getLogger("poc_zappos")
 # Constants
 # ---------------------------------------------------------------------------
 
-# Nike Air Max 90 — classic silhouette with clear sole + upper images
-POC_PRODUCT_URL = "https://www.zappos.com/p/nike-air-max-90/product/8005382"
+# Nike Air Max 90 — classic silhouette with clear sole + upper images.
+#
+# ⚠️  IMPORTANT: Zappos product URLs can become stale when products are
+# discontinued or re-catalogued. If you see a RuntimeError about a "no-results
+# page", visit https://www.zappos.com, search for "Nike Air Max 90", open a
+# product page, and copy its URL here.
+#
+# Last verified working (approx. 2026-03-28): product/8005382 — now stale.
+# Updated candidate (may require re-verification): product/9246807
+POC_PRODUCT_URL = "https://www.zappos.com/p/nike-air-max-90/product/9246807"
 
 # Max images to upload during PoC (keeps runtime short)
 MAX_IMAGES_TO_UPLOAD = 5

@@ -68,6 +68,28 @@ class ZapposScraper(BaseScraper):
         if soup is None:
             raise RuntimeError(f"Failed to fetch Zappos product page: {url}")
 
+        # Detect Zappos "no results" / 404 redirect pages — raised before
+        # extracting any fields so callers get a clear error message.
+        h1 = soup.find("h1")
+        if h1:
+            h1_text = h1.get_text(strip=True).lower()
+            if any(
+                phrase in h1_text
+                for phrase in (
+                    "couldn't find",
+                    "could not find",
+                    "no results",
+                    "page not found",
+                    "oops",
+                )
+            ):
+                raise RuntimeError(
+                    f"Zappos returned a no-results/redirect page for URL: {url}\n"
+                    f"  H1 text: '{h1.get_text(strip=True)}'\n"
+                    f"  The product ID may be stale — find a current product URL from "
+                    f"zappos.com and update POC_PRODUCT_URL in scripts/poc_zappos.py."
+                )
+
         external_id = self._extract_product_id(url)
         brand = self._extract_brand(soup)
 

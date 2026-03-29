@@ -1,6 +1,10 @@
 # ================================================================
 # Python Dependencies — Gaitway Footwear Intelligence Database
 # Install inside Dev Container only: pip install -r requirements.txt
+#
+# Python 3.13 compatibility notes (updated 2026-03-29):
+#   pandas==2.2.2  → 2.2.3  (first release with CP313 wheels)
+#   psycopg2-binary==2.9.9 → 2.9.10 (first release with CP313 wheels)
 # ================================================================
 
 # AWS SDK
@@ -18,11 +22,11 @@ beautifulsoup4==4.12.3
 lxml==5.3.0
 
 # Data handling
-pandas==2.2.2
+pandas==2.2.3
 python-dotenv==1.0.1
 
 # Database (PostgreSQL + pgvector)
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 SQLAlchemy==2.0.35
 alembic==1.13.3
 pgvector==0.3.3

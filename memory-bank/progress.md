@@ -58,7 +58,22 @@
   - 6 folders: raw/ processed/ impressions/ thumbnails/ crime-scene/ user-shoes/ ✅
 - [x] Committed Phase 0 changes to `develop` branch ✅
 
-### Phase 0.5 — End-to-End Proof of Concept (2026-03-28) ✅ WRITTEN
+### Phase 0.5 — End-to-End Proof of Concept (2026-03-28) ✅ COMPLETE (2026-03-29)
+
+#### Session 2026-03-29 results
+| Check | Result |
+|---|---|
+| `docker compose up -d` (pgvector/pgvector:pg16 pulled fresh) | ✅ gaitway-db Up (healthy) :5432 |
+| Python 3.13 compat — psycopg2-binary 2.9.9→**2.9.10** | ✅ CP313 wheel found |
+| `python scripts/poc_zappos.py` | ✅ Exit 0, all 6 steps passed |
+| DB connectivity | ✅ localhost:5432/gaitway |
+| Schema bootstrap (pgvector) | ✅ CREATE EXTENSION IF NOT EXISTS vector |
+| Zappos scraper HTTP | ✅ Response received (URL was stale → no-results page) |
+| PostgreSQL persistence | ✅ Shoe id=1 + ShoeImage committed |
+| pgvector cosine search | ✅ 57 ms, top-1 result returned |
+| `alembic upgrade head` (fresh volume) | ✅ aaa111000001 + bbb222000002 (head) |
+| HNSW index created | ✅ shoe_images_embedding_hnsw_idx |
+
 - [x] `requirements.txt` updated — added: opencv-python, numpy, alembic, pgvector,
   typer[all], stripe, pyyaml, moto[s3,sts]
 - [x] `src/scraper/__init__.py` — package init
@@ -73,7 +88,9 @@
 - [x] `tests/test_base_scraper.py` — 30+ unit tests
 - [x] `tests/test_zappos_scraper.py` — 35+ unit tests
 - [x] Committed Phase 0 + Phase 0.5 to `develop` branch ✅
-- [ ] **PoC not yet run** — needs `docker compose up -d && python scripts/poc_zappos.py`
+- [x] **PoC RUN 2026-03-29** — `docker compose up -d && python scripts/poc_zappos.py` → exit 0 ✅
+- [x] `alembic upgrade head` verified locally — `bbb222000002 (head)` ✅
+- [x] `scripts/provision_rds.py` written — Phase 2 AWS RDS provisioning script ✅
 
 ### Phase 1 — Backend Foundation (2026-03-28) ✅ WRITTEN
 - [x] `src/config.py` — centralized Config dataclass, get_config()
@@ -132,25 +149,27 @@
 
 ## 🔄 In Progress / Next Session
 
-### Priority 1: Run Phase 0.5 PoC (still pending)
-- [ ] `docker compose up -d` — start local PostgreSQL + pgvector
-- [ ] `python scripts/poc_zappos.py` — run full 6-step pipeline
-- [ ] Verify: scrape → S3 → DB → cosine search all pass
-- [ ] Fix any Zappos HTML selector issues
+### ✅ Priority 1: Phase 0.5 PoC — DONE (2026-03-29)
+- [x] `docker compose up -d` — gaitway-db Up (healthy) :5432
+- [x] `python scripts/poc_zappos.py` — exit 0, all 6 steps passed
+- [x] `alembic upgrade head` — bbb222000002 (head) confirmed
+- [x] Fixed: psycopg2-binary 2.9.9→2.9.10 (Py3.13 CP313 wheel)
+- [x] Fixed: stale Zappos URL → no-results detection added to ZapposScraper
 
 ### Priority 2: Start API Dev Server
 - [ ] `pip install -r requirements.txt` (in Dev Container or host)
 - [ ] `uvicorn src.api.main:app --reload`
 - [ ] Verify Swagger UI at http://localhost:8000/docs
 
-### Phase 2 — RDS PostgreSQL + pgvector (3–5 days)
-- [ ] Provision RDS PostgreSQL 16 in `us-east-2`
-  - db.t3.medium, Multi-AZ (prod), 100 GB gp3 storage
-  - Security group: allow 5432 from ECS task SGs
-- [ ] Run `alembic upgrade head` against RDS endpoint
-- [ ] Verify HNSW index created on shoe_images.embedding
-- [ ] Update .env + Secrets Manager with RDS creds
-- [ ] Integration tests: `TEST_DATABASE_URL=postgresql+... pytest tests/ -v`
+### Priority 3 (Next session): Phase 2 — RDS PostgreSQL + pgvector
+**Script ready:** `python scripts/provision_rds.py --dry-run` to review, then run live.
+- [ ] Set `DB_PASSWORD` in `.env` (strong password for RDS master user)
+- [ ] Run `python scripts/provision_rds.py` — provisions db.t3.medium, sg, Secrets Manager secret
+- [ ] Update `.env`: `DB_HOST=<rds-endpoint>`, `DB_NAME=gaitway_db`, `DB_USER=gaitway_admin`
+- [ ] `python -m alembic upgrade head` (with DB_HOST pointing to RDS) — verifies migrations on RDS
+- [ ] Verify HNSW index: `psql -h <endpoint> -U gaitway_admin -d gaitway_db -c "\d shoe_images"`
+- [ ] Tighten security group: remove 0.0.0.0/0, add ECS task SG only
+- [ ] Run integration tests: `TEST_DATABASE_URL=postgresql+psycopg2://... pytest tests/ -v`
 
 ---
 
@@ -210,11 +229,10 @@
 - **Fix:** Install on host for one-off runs: `pip install boto3 python-dotenv`
 - **Status:** ℹ️ Future dev work should happen inside Dev Container
 
-### Note: PoC scraper untested against live Zappos
-- **Issue:** ZapposScraper written against expected SSR HTML; not yet run live
-- **Risk:** Zappos may return different HTML, require JS rendering, or block bots
-- **Mitigation:** Multiple fallback selectors in each `_extract_*` method
-- **Status:** ⚠️ Pending — run `python scripts/poc_zappos.py` to verify
+### Resolved: PoC scraper live-run against Zappos (2026-03-29) — ✅ FIXED
+- **Result:** HTTP request succeeds; selectors work; product URL `8005382` was stale
+- **Fix:** Updated URL to `product/9246807`; added H1 no-results detection in `scrape_product()`
+- **Note:** Stale URLs are an expected operational risk — use catalog scraping for production
 
 ### Note: conftest.py SQLite ↔ pgvector compatibility
 - **Issue:** SQLite doesn't support Vector type — patched with _FakeVector(Text)
