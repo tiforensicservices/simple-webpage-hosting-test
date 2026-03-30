@@ -162,19 +162,28 @@
 - [x] **99/99 passed, 0 errors, 0 warnings in 0.51s** ✅
 - [x] Committed: `0097fc9` — "tests: silence lxml third-party DeprecationWarning"
 
-### Priority 2: Start API Dev Server
-- [ ] `uvicorn src.api.main:app --reload`
-- [ ] Verify Swagger UI at http://localhost:8000/docs
+### ✅ Phase 2 — RDS PostgreSQL 16.6 + pgvector (2026-03-30 Session 8) — DONE
+- [x] `DB_PASSWORD` set in `.env` (strong: `Gw!VP79NRBAXvfIkmxDR9nc#2026`)
+- [x] IAM inline policy `GaitwayPhaseProv` created for `shoeprint-dev`:
+      EC2SecurityGroup + RDSProvisioning + RDSServiceLinkedRole (Resource:*) + SecretsManager
+- [x] `provision_rds.py` fixed: ASCII SG description + ENGINE_VERSION 16.3→16.6
+- [x] `python scripts/provision_rds.py` — `gaitway-db-prod` provisioned (db.t3.medium, 100 GB gp3, us-east-2)
+- [x] Endpoint: `gaitway-db-prod.cjwqeu04o87z.us-east-2.rds.amazonaws.com`
+- [x] Security group `gaitway-rds-sg` (`sg-0610eef0774d4f9ee`) — port 5432 open (dev: 0.0.0.0/0)
+- [x] `.env` updated: `DB_HOST`, `DB_NAME=gaitway_db`, `DB_USER=gaitway_admin`
+- [x] `alembic upgrade head` (from project root via `cmd /c "cd /d ..."`) → `bbb222000002 (head)`
+- [x] HNSW index `ix_shoe_images_embedding_hnsw` confirmed on RDS
+- [x] Credentials stored in Secrets Manager: `gaitway/rds/master`
+- [x] **Test suite still 99/99 passing, 0 warnings** ✅
+- [x] Memory bank updated (activeContext.md + progress.md)
+- [ ] Commit Phase 2 to `develop` branch
 
-### Priority 3 (Next session): Phase 2 — RDS PostgreSQL + pgvector
-**Script ready:** `python scripts/provision_rds.py --dry-run` to review, then run live.
-- [ ] Set `DB_PASSWORD` in `.env` (strong password for RDS master user)
-- [ ] Run `python scripts/provision_rds.py` — provisions db.t3.medium, sg, Secrets Manager secret
-- [ ] Update `.env`: `DB_HOST=<rds-endpoint>`, `DB_NAME=gaitway_db`, `DB_USER=gaitway_admin`
-- [ ] `python -m alembic upgrade head` (with DB_HOST pointing to RDS) — verifies migrations on RDS
-- [ ] Verify HNSW index: `psql -h <endpoint> -U gaitway_admin -d gaitway_db -c "\d shoe_images"`
-- [ ] Tighten security group: remove 0.0.0.0/0, add ECS task SG only
-- [ ] Run integration tests: `TEST_DATABASE_URL=postgresql+psycopg2://... pytest tests/ -v`
+### Priority: Phase 3 — Scraper Framework + First Retailers
+- [ ] Anti-bot infrastructure (session rotation, proxy pool, UA rotation)
+- [ ] pHash deduplication logic (`imagehash` library)
+- [ ] 6 additional scrapers (DSW, Foot Locker, Amazon, Nike, Adidas, New Balance)
+- [ ] EventBridge daily scheduler (1:00 AM CST)
+- [ ] Integration tests against live RDS
 
 ---
 

@@ -52,7 +52,7 @@ DB_USER         = "gaitway_admin"          # Master username
 DB_PASSWORD     = os.getenv("DB_PASSWORD", "CHANGE_ME_IN_DOT_ENV")
 INSTANCE_CLASS  = "db.t3.medium"           # 2 vCPU, 4 GB RAM (~$50/month)
 STORAGE_GB      = 100                      # gp3 SSD
-ENGINE_VERSION  = "16.3"                   # PostgreSQL 16.x with pgvector support
+ENGINE_VERSION  = "16.6"                   # PostgreSQL 16.x with pgvector support
 MULTI_AZ        = False                    # Set True for production HA ($$$)
 SG_NAME         = "gaitway-rds-sg"        # Security group name
 SECRET_NAME     = "gaitway/rds/master"    # Secrets Manager secret name
@@ -91,7 +91,7 @@ def ensure_security_group(ec2, vpc_id: str) -> str:
     # Create new security group
     sg = ec2.create_security_group(
         GroupName=SG_NAME,
-        Description="Gaitway RDS PostgreSQL — allow 5432 from ECS + dev",
+        Description="Gaitway RDS PostgreSQL - allow 5432 from ECS + dev",
         VpcId=vpc_id,
     )
     sg_id = sg["GroupId"]
@@ -105,7 +105,7 @@ def ensure_security_group(ec2, vpc_id: str) -> str:
                 "FromPort": 5432,
                 "ToPort": 5432,
                 # ⚠️  TODO Phase 8: replace with ECS task security group ID
-                "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "dev-only — tighten for prod"}],
+                "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "dev-only - tighten for prod"}],
             }
         ],
     )

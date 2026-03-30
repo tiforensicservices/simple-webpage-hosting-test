@@ -21,7 +21,7 @@ import logging
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,7 @@ class ShoeImageResponse(BaseModel):
     width: Optional[int] = None
     height: Optional[int] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ShoeResponse(BaseModel):
@@ -68,8 +67,7 @@ class ShoeResponse(BaseModel):
     product_url: Optional[str] = None
     images: List[ShoeImageResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ShoeListResponse(BaseModel):

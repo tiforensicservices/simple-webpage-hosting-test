@@ -206,7 +206,8 @@ class TestErrorHandling:
 
     def test_echo_without_json_returns_422(self, client):
         """Posting to echo without JSON should fail validation."""
-        response = client.post("/echo", data="not json")
+        # Use content= (bytes) to avoid httpx DeprecationWarning for data=
+        response = client.post("/echo", content=b"not json", headers={"content-type": "text/plain"})
         # FastAPI returns 422 (Unprocessable Entity) for validation errors
         assert response.status_code in [400, 422]
 

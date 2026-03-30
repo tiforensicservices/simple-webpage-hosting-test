@@ -23,6 +23,8 @@ Usage:
 """
 
 import logging
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException, status
@@ -40,6 +42,29 @@ logger = logging.getLogger(__name__)
 # FastAPI app
 # ─────────────────────────────────────────────────────────────
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager — replaces deprecated @app.on_event."""
+    # ── Startup ──────────────────────────────────────────────────────────────
+    cfg = get_config()
+    if cfg.api_key:
+        logger.info("✅ API key is configured")
+    else:
+        logger.warning(
+            "⚠️  API_KEY is not configured — running in dev mode (no auth)"
+        )
+    if cfg.s3_bucket:
+        logger.info(
+            "✅ S3 bucket configured: %s (region: %s)", cfg.s3_bucket, cfg.aws_region
+        )
+    else:
+        logger.warning("⚠️  S3_BUCKET_NAME is not configured — upload endpoints will fail")
+    logger.info("🚀 Gaitway API v0.1.0 started — %d route prefixes registered", 5)
+    yield
+    # ── Shutdown (add cleanup here if needed) ────────────────────────────────
+    logger.info("🛑 Gaitway API shutting down")
+
+
 app = FastAPI(
     title="Gaitway Footwear Intelligence API",
     version="0.1.0",
@@ -51,6 +76,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
 # ── CORS (restrict in production via ALLOWED_ORIGINS env var) ─────────────────
@@ -108,28 +134,6 @@ class ErrorResponse(BaseModel):
 
     error: str
     detail: Optional[str] = None
-
-
-# ─────────────────────────────────────────────────────────────
-# Startup & Shutdown Events
-# ─────────────────────────────────────────────────────────────
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Run on app startup — verify configuration and log readiness."""
-    cfg = get_config()
-    if cfg.api_key:
-        logger.info("✅ API key is configured")
-    else:
-        logger.warning(
-            "⚠️  API_KEY is not configured — running in dev mode (no auth)"
-        )
-    if cfg.s3_bucket:
-        logger.info("✅ S3 bucket configured: %s (region: %s)", cfg.s3_bucket, cfg.aws_region)
-    else:
-        logger.warning("⚠️  S3_BUCKET_NAME is not configured — upload endpoints will fail")
-    logger.info("🚀 Gaitway API v0.1.0 started — %d route prefixes registered", 5)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -203,10 +207,8 @@ async def echo(data: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         The same data with a UTC timestamp and API version appended.
     """
-    from datetime import datetime
-
     return {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "received": data,
         "api_version": "0.1.0",
     }

@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, UploadFile, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +67,8 @@ class CrimeSceneSearchResponse(BaseModel):
 class CrimeSceneQuerySummary(BaseModel):
     """Summary of a past crime scene query (list view)."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     workspace_id: int
     s3_key: str
@@ -74,12 +76,11 @@ class CrimeSceneQuerySummary(BaseModel):
     query_duration_ms: Optional[int] = None
     created_at: str
 
-    class Config:
-        from_attributes = True
-
 
 class CrimeSceneQueryDetail(BaseModel):
     """Full detail of a past crime scene query including results."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     workspace_id: int
@@ -88,9 +89,6 @@ class CrimeSceneQueryDetail(BaseModel):
     results_json: Optional[Dict[str, Any]] = None
     query_duration_ms: Optional[int] = None
     created_at: str
-
-    class Config:
-        from_attributes = True
 
 
 # ─────────────────────────────────────────────────────────────
